@@ -35,14 +35,20 @@ public class DiningPhilosopher {
 
     public void start() {
         for(Philosopher p : philosophers) p.start();
-        while(System.currentTimeMillis() < terminationTime && deadlockDetected()){
-
+        while(System.currentTimeMillis() < terminationTime && !deadlockDetected()){
+            continue;
         }
         for(Philosopher p : philosophers) p.interrupt();
     }
 
-    private boolean deadlockDetected() {
-        return true;
+    private synchronized boolean deadlockDetected() {
+        for (Semaphore c : chopsticks){
+            if (c.tryAcquire()){
+                System.out.println("deadlock!");
+                return true;
+            }
+        }
+        return false;
     }
 
     public ArrayList<Philosopher> getPhilosophers() {

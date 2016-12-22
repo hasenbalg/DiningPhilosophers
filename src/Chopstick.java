@@ -14,11 +14,15 @@ public class Chopstick {
         return id;
     }
 
-    public void setIs_busy(boolean is_busy) {
-        this.is_busy = is_busy;
-    }
-
     public boolean isIs_busy() {
         return is_busy;
+    }
+
+    public void take() {
+        this.is_busy = true;
+    }
+
+    public void release() {
+        this.is_busy = false;
     }
 }

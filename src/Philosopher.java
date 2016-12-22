@@ -51,6 +51,8 @@ public class Philosopher extends Thread {
         this.status = States.EATING;
         System.out.println("P" + id + " is " + this.status);
         this.sleep((long) (Math.random() * MAXTIME) + 1);
+        chopsticks.get(id).release();
+        chopsticks.get((id + 1) % chopsticks.size()).release();
     }
 
     private void think() throws InterruptedException {
