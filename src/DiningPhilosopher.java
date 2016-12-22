@@ -42,12 +42,21 @@ public class DiningPhilosopher {
     }
 
     private synchronized boolean deadlockDetected() {
-        for (Semaphore c : chopsticks){
-            if (c.tryAcquire()){
-                System.out.println("deadlock!");
-                return true;
-            }
-        }
+//        for (Semaphore c : chopsticks){
+//            if (c.tryAcquire()){
+//                System.out.println("deadlock!");
+//                for (Philosopher p : philosophers) p.interrupt();
+//                for (Philosopher p : philosophers){
+//                    try {
+//                        p.join();
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
+//
+//                return true;
+//            }
+//        }
         return false;
     }
 

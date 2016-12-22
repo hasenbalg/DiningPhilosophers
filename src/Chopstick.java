@@ -18,7 +18,7 @@ public class Chopstick {
         return is_busy;
     }
 
-    public void take() {
+    public void acquire() {
         this.is_busy = true;
     }
 

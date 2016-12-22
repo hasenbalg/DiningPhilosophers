@@ -9,9 +9,9 @@ enum States {
 }
 
 public class Philosopher extends Thread {
-    private long averageThinkingTime;
-    private long averageEatingTime;
-    private long averageHungryTime;
+    private ArrayList<Long> thinkingTimes;
+    private ArrayList<Long> eatingTimes;
+    private ArrayList<Long> hungtyTimes;
     private long numberOfEatingTurns;
 
     private final int MAXTIME = 10;
@@ -20,9 +20,14 @@ public class Philosopher extends Thread {
     private ArrayList<Semaphore> chopsticks;
     private States status;
 
+
     public Philosopher(int id, ArrayList<Semaphore> chopsticks) {
         this.id = id;
         this.chopsticks = chopsticks;
+
+        thinkingTimes = new ArrayList<>();
+        eatingTimes = new ArrayList<>();
+        hungtyTimes = new ArrayList<>();
     }
 
     @Override
@@ -32,9 +37,13 @@ public class Philosopher extends Thread {
 
     @Override
     public void run() {
-        super.run();
         try {
             think();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        try {
+
             eat();
         } catch (InterruptedException e) {
             e.printStackTrace();
@@ -43,6 +52,7 @@ public class Philosopher extends Thread {
 
     private synchronized void eat() throws InterruptedException {
         System.out.println("P" + id + " wants to get Chopstick " + id + " and its state is " + chopsticks.get(id).tryAcquire());
+        System.out.println("P" + id + " wants to get Chopstick " + (id + 1) % chopsticks.size() + " and its state is " + chopsticks.get((id + 1) % chopsticks.size()).tryAcquire());
         chopsticks.get(id).acquire();
         System.out.println("P" + id + " got Chopstick " + id + " and its state is " +          chopsticks.get(id).tryAcquire());
         System.out.println("P" + id + " got Chopstick " + id);
@@ -50,29 +60,46 @@ public class Philosopher extends Thread {
         System.out.println("P" + id + " got Chopstick " + (id + 1) % chopsticks.size());
         this.status = States.EATING;
         System.out.println("P" + id + " is " + this.status);
-        this.sleep((long) (Math.random() * MAXTIME) + 1);
+        long eatingTime = (long) (Math.random() * MAXTIME) + 1;
+        System.out.println("eatingTime" + eatingTime);
+        Thread.sleep(eatingTime);
         chopsticks.get(id).release();
         chopsticks.get((id + 1) % chopsticks.size()).release();
+
+        eatingTimes.add(eatingTime);
+        numberOfEatingTurns ++;
     }
 
     private void think() throws InterruptedException {
         this.status = States.THINKING;
         System.out.println("P" + id + " is " + this.status);
-        this.sleep((long) (Math.random() * MAXTIME) + 1);
+        long thinkingTime = (long) (Math.random() * MAXTIME) + 1;
+        System.out.println("thinkingTime" + thinkingTime);
+        Thread.sleep(thinkingTime);
         this.status = States.HUNGRY;
         System.out.println("P" + id + " is " + this.status);
+        thinkingTimes.add(thinkingTime);
     }
 
     public long getAverageThinkingTime() {
-        return averageThinkingTime;
+        int sum = 0;
+        if (thinkingTimes.size() < 1) return 0;
+        for(Long t:thinkingTimes) sum += t;
+        return sum / numberOfEatingTurns;
     }
 
     public long getAverageEatingTime() {
-        return averageEatingTime;
+        int sum = 0;
+        if (eatingTimes.size() < 1) return 0;
+        for(Long t:eatingTimes) sum += t;
+        return sum / numberOfEatingTurns;
     }
 
     public long getAverageHungryTime() {
-        return averageHungryTime;
+        int sum = 0;
+        if (hungtyTimes.size() < 1) return 0;
+        for(Long t:hungtyTimes) sum += t;
+        return sum / numberOfEatingTurns;
     }
 
     public long getNumberOfEatingTurns() {
