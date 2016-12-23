@@ -7,9 +7,11 @@ import java.util.concurrent.Semaphore;
 public class DiningPhilosopher {
     private int simulationTime;
     private ArrayList<Philosopher> philosophers;
-    private ArrayList<Semaphore> chopsticks;
+    private ArrayList<Chopstick> chopsticks;
     private long terminationTime;
     private final int N = 5;
+    DeadlockDetecter deadlockDetecter;
+
 
     public DiningPhilosopher(){
 
@@ -25,40 +27,33 @@ public class DiningPhilosopher {
         philosophers = new ArrayList<>();
 
         for (int i = 0; i < N; i++){
-            chopsticks.add(new Semaphore(1));
+            chopsticks.add(new Chopstick(i));
         }
 
         for (int i = 0; i < N; i++){
             philosophers.add(new Philosopher(i, chopsticks));
         }
+
+        deadlockDetecter = new DeadlockDetecter(chopsticks, philosophers);
+
     }
 
     public void start() {
         for(Philosopher p : philosophers) p.start();
-        while(System.currentTimeMillis() < terminationTime && !deadlockDetected()){
-            continue;
+        System.err.println("philosophers started");
+        deadlockDetecter.start();
+        try {
+            Thread.sleep(simulationTime);
+        } catch (InterruptedException e) {
+            System.err.println("fuck");
+            e.printStackTrace();
         }
-        for(Philosopher p : philosophers) p.interrupt();
+
+        for(Philosopher p : philosophers) p.finnish();
+        deadlockDetecter.finnish();
     }
 
-    private synchronized boolean deadlockDetected() {
-//        for (Semaphore c : chopsticks){
-//            if (c.tryAcquire()){
-//                System.out.println("deadlock!");
-//                for (Philosopher p : philosophers) p.interrupt();
-//                for (Philosopher p : philosophers){
-//                    try {
-//                        p.join();
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                }
-//
-//                return true;
-//            }
-//        }
-        return false;
-    }
+
 
     public ArrayList<Philosopher> getPhilosophers() {
         return philosophers;
